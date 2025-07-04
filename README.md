@@ -113,13 +113,21 @@ Project Structure
 
 spotify-ytm-converter/
 ├── api.py                 # Main FastAPI application
+|
 ├── auth_browser.py        # Browser authentication
+|
 ├── fetch_spotify.py       # Spotify data fetching
+|
 ├── fetch_ytm.py          # YouTube Music data fetching
+|
 ├── match_engine.py       # Fuzzy matching engine
+|
 ├── converter.py          # Data conversion utilities
+|
 ├── requirements.txt      # Python dependencies
+|
 ├── README.md            # This file
+|
 └── templates/           # HTML templates
     ├── index.html       # Landing page
     ├── library.html     # Library selection
