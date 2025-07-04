@@ -1,6 +1,6 @@
 ## Spotify ↔ YouTube Music Playlist Converter
 
-*** A bi-directional music playlist converter that allows you to transfer your music library between Spotify and YouTube Music using browser-based authentication (no API keys required). ***
+***A bi-directional music playlist converter that allows you to transfer your music library between Spotify and YouTube Music using browser-based authentication (no API keys required).***
 ✨ Features
 
     Bi-directional conversion: Spotify → YouTube Music and YouTube Music → Spotify
@@ -166,15 +166,20 @@ Run with debug logging:
 
 python api.py --log-level debug
 
-📝 License
+**📝 License**
+
 
 This project is open source and available under the MIT License.
 
 
-*** 🤝 Contributing ***
+***🤝 Contributing***
+
+
 Contributions are welcome! Please feel free to submit a Pull Request.
 
 
 
-*** ⚠️ Disclaimer ***
+***⚠️ Disclaimer***
+
+
 This tool is for personal use only. Please respect the terms of service of both Spotify and YouTube Music. The developers are not responsible for any misuse of this application.
