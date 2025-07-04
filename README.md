@@ -62,27 +62,27 @@ Authentication Issues
     Log in to your accounts when prompted
     The app will automatically capture your session
 
-Step 3: Select Content
+## Step 3: Select Content
 
     Browse your library (playlists, liked songs, albums, artists)
     Select the items you want to convert
     Click "Continue"
 
-Step 4: Review Matches
+## Step 4: Review Matches
 
     Review the automatic matches found on the target platform
     Correct any mismatches using the manual correction feature
     Deselect any unwanted tracks
 
-Step 5: Create Playlist
+## Step 5: Create Playlist
 
     Confirm your selection
     The app will create a new playlist on the target platform
     You'll receive a link to your new playlist
 
-🏗️ Architecture
+## 🏗️ Architecture
 
-The application is built with a modular architecture:
+## The application is built with a modular architecture:
 
     api.py: FastAPI server with all endpoints and session management
     auth_browser.py: Browser automation for authentication
@@ -108,7 +108,7 @@ Customization
     Modify browser options in auth_browser.py
     Customize UI styling in template files
 
-🛠️ Development
+## 🛠️ Development
 Project Structure
 
 spotify-ytm-converter/
@@ -132,14 +132,14 @@ Adding New Features
     Enhanced matching: Extend match_engine.py with additional algorithms
     UI improvements: Modify templates and add new endpoints in api.py
 
-🔒 Security & Privacy
+## 🔒 Security & Privacy
 
     No data storage: All session data is kept in memory and cleared after conversion
     Local processing: No music data is sent to external servers
     Browser automation: Uses your own browser session for authentication
     No API keys: Authentication handled through browser login flows
 
-🐛 Troubleshooting
+## 🐛 Troubleshooting
 Common Issues
 
 Authentication fails
