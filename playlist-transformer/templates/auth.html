@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication - Music Converter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .platform-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+        
+        .spotify-icon { color: #1DB954; }
+        .ytm-icon { color: #FF0000; }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        .auth-status {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .status-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .status-text {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .status-desc {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .browser-window {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        
+        .browser-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .browser-dots {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .browser-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dee2e6;
+        }
+        
+        .browser-dot.red { background: #ff5f56; }
+        .browser-dot.yellow { background: #ffbd2e; }
+        .browser-dot.green { background: #27ca3f; }
+        
+        .browser-url {
+            color: #666;
+            font-size: 0.9em;
+            font-family: monospace;
+        }
+        
+        .instructions {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .instructions h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .instructions ol {
+            color: #333;
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .progress-steps {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .step {
+            text-align: center;
+            padding: 10px;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            margin: 0 10px;
+        }
+        
+        .step-number {
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .step-label {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .step.active {
+            border-color: #667eea;
+            background: #e3f2fd;
+        }
+        
+        .step.completed {
+            border-color: #27ca3f;
+            background: #f8f9fa;
+        }
+        
+        .step-arrow {
+            font-size: 1.5em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="platform-icon {{ 'spotify-icon' if platform == 'spotify' else 'ytm-icon' }}">
+            {{ '🎧' if platform == 'spotify' else '🎵' }}
+        </div>
+        
+        <h1>{{ platform.upper() }} Authentication</h1>
+        <p class="subtitle">
+            {% if is_source %}
+                Please log in to access your {{ platform.upper() }} library
+            {% else %}
+                Please log in to create playlists on {{ platform.upper() }}
+            {% endif %}
+        </p>
+        
+        <!-- Progress indicator -->
+        <div class="progress-steps">
+            <div class="step {{ 'active' if is_source else 'completed' }}">
+                <div class="step-number">1</div>
+                <div class="step-label">Source Platform</div>
+            </div>
+            <div class="step-arrow">→</div>
+            <div class="step {{ 'active' if is_target else '' }}">
+                <div class="step-number">2</div>
+                <div class="step-label">Target Platform</div>
+            </div>
+        </div>
+        
+        <div class="auth-status" id="authStatus">
+            <div class="status-icon">🔐</div>
+            <div class="status-text">
+                {% if is_source %}
+                    Source Platform Authentication Required
+                {% else %}
+                    Target Platform Authentication Required
+                {% endif %}
+            </div>
+            <div class="status-desc">
+                {% if is_source %}
+                    A browser window will open for you to log in and access your library
+                {% else %}
+                    A browser window will open for you to log in and create playlists
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="browser-window">
+            <div class="browser-header">
+                <div class="browser-dots">
+                    <div class="browser-dot red"></div>
+                    <div class="browser-dot yellow"></div>
+                    <div class="browser-dot green"></div>
+                </div>
+                <div class="browser-url" id="browserUrl">
+                    {{ 'accounts.spotify.com' if platform == 'spotify' else 'accounts.google.com' }}
+                </div>
+            </div>
+            <div class="instructions">
+                <h3>📋 Instructions:</h3>
+                <ol>
+                    <li>A browser window will open automatically</li>
+                    <li>Log in to your {{ platform.upper() }} account</li>
+                    <li>Complete any security verification if prompted</li>
+                    <li>Wait for the authentication to complete</li>
+                    {% if is_target %}
+                    <li>You'll be redirected to the next step automatically</li>
+                    {% endif %}
+                </ol>
+            </div>
+        </div>
+        
+        <form id="authForm" action="/auth/complete" method="post" class="hidden">
+            <input type="hidden" name="session_id" value="{{ session_id }}">
+            <input type="hidden" name="platform" value="{{ platform }}">
+            <button type="submit" class="btn" id="completeBtn">
+                <span class="loading hidden" id="loadingSpinner"></span>
+                <span id="btnText">
+                    {% if is_source %}
+                        Complete Source Authentication
+                    {% else %}
+                        Complete Target Authentication
+                    {% endif %}
+                </span>
+            </button>
+        </form>
+        
+        <div class="button-group">
+            <button type="button" class="btn btn-secondary" onclick="cancelAuth()">
+                Cancel Authentication
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="window.location.href='/'">
+                ← Back to Start
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const authStatus = document.getElementById('authStatus');
+        const authForm = document.getElementById('authForm');
+        const completeBtn = document.getElementById('completeBtn');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const btnText = document.getElementById('btnText');
+        
+        // Check authentication status periodically
+        let authCheckInterval;
+        
+        function startAuthCheck() {
+            authCheckInterval = setInterval(() => {
+                // This would ideally check with the backend for auth status
+                // For now, we'll simulate the process
+                checkAuthStatus();
+            }, 2000);
+        }
+        
+        function checkAuthStatus() {
+            // Check authentication status with the backend
+            fetch(`/auth/status/{{ session_id }}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Auth status:', data);
+                    
+                    if (data.status === 'completed') {
+                        // Authentication successful
+                        authStatus.innerHTML = `
+                            <div class="status-icon">✅</div>
+                            <div class="status-text">Authentication Successful</div>
+                            <div class="status-desc">${data.message}</div>
+                        `;
+                        authForm.classList.remove('hidden');
+                        
+                        // Stop checking auth status
+                        if (authCheckInterval) {
+                            clearInterval(authCheckInterval);
+                        }
+                        
+                    } else if (data.status === 'error') {
+                        // Authentication failed
+                        authStatus.innerHTML = `
+                            <div class="status-icon">❌</div>
+                            <div class="status-text">Authentication Failed</div>
+                            <div class="status-desc">${data.message}</div>
+                        `;
+                        
+                        // Stop checking auth status
+                        if (authCheckInterval) {
+                            clearInterval(authCheckInterval);
+                        }
+                    } else if (data.status === 'pending') {
+                        // Still waiting for authentication
+                        authStatus.innerHTML = `
+                            <div class="status-icon">⏳</div>
+                            <div class="status-text">Authentication in Progress</div>
+                            <div class="status-desc">${data.message}</div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking auth status:', error);
+                });
+        }
+        
+        function cancelAuth() {
+            if (confirm('Are you sure you want to cancel authentication? This will close the browser window.')) {
+                // Submit cancel form
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/auth/cancel';
+                
+                const sessionInput = document.createElement('input');
+                sessionInput.type = 'hidden';
+                sessionInput.name = 'session_id';
+                sessionInput.value = '{{ session_id }}';
+                
+                form.appendChild(sessionInput);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+        
+        // Start checking auth status when page loads
+        startAuthCheck();
+        
+        completeBtn.addEventListener('click', () => {
+            loadingSpinner.classList.remove('hidden');
+            btnText.textContent = 'Processing...';
+            completeBtn.disabled = true;
+        });
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (authCheckInterval) {
+                clearInterval(authCheckInterval);
+            }
+        });
+    </script>
+</body>
+</html>

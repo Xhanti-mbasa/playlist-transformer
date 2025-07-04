@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify ↔ YouTube Music Converter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        
+        .direction-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .direction-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .direction-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.2);
+        }
+        
+        .direction-card.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .direction-card.selected .icon {
+            color: white;
+        }
+        
+        .icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+        
+        .direction-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .direction-desc {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        
+        .start-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .start-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .features {
+            margin-top: 30px;
+            text-align: left;
+        }
+        
+        .features h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .feature-list {
+            list-style: none;
+            color: #666;
+        }
+        
+        .feature-list li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Music Converter</h1>
+        <p class="subtitle">Convert playlists between Spotify and YouTube Music</p>
+        
+        <form id="directionForm" action="/auth/start" method="post">
+            <div class="direction-grid">
+                <div class="direction-card" data-direction="spotify-ytm">
+                    <div class="icon">🎧</div>
+                    <div class="direction-title">Spotify → YTM</div>
+                    <div class="direction-desc">Convert from Spotify to YouTube Music</div>
+                </div>
+                
+                <div class="direction-card" data-direction="ytm-spotify">
+                    <div class="icon">🎵</div>
+                    <div class="direction-title">YTM → Spotify</div>
+                    <div class="direction-desc">Convert from YouTube Music to Spotify</div>
+                </div>
+            </div>
+            
+            <input type="hidden" id="sourcePlatform" name="source" value="">
+            <input type="hidden" id="targetPlatform" name="target" value="">
+            
+            <button type="submit" class="start-btn" id="startBtn" disabled>
+                Choose a direction to start
+            </button>
+        </form>
+        
+        <div class="features">
+            <h3>✨ Features</h3>
+            <ul class="feature-list">
+                <li>Convert playlists, liked songs, and albums</li>
+                <li>Fuzzy matching with manual corrections</li>
+                <li>Browser-based authentication (no API keys needed)</li>
+                <li>Bi-directional conversion</li>
+                <li>Local processing - your data stays private</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const directionCards = document.querySelectorAll('.direction-card');
+        const sourceInput = document.getElementById('sourcePlatform');
+        const targetInput = document.getElementById('targetPlatform');
+        const startBtn = document.getElementById('startBtn');
+        
+        directionCards.forEach(card => {
+            card.addEventListener('click', () => {
+                // Remove selection from all cards
+                directionCards.forEach(c => c.classList.remove('selected'));
+                
+                // Select clicked card
+                card.classList.add('selected');
+                
+                // Set form values
+                const direction = card.dataset.direction;
+                if (direction === 'spotify-ytm') {
+                    sourceInput.value = 'spotify';
+                    targetInput.value = 'ytm';
+                } else {
+                    sourceInput.value = 'ytm';
+                    targetInput.value = 'spotify';
+                }
+                
+                // Enable start button
+                startBtn.disabled = false;
+                startBtn.textContent = 'Start Conversion';
+            });
+        });
+    </script>
+</body>
+</html> 

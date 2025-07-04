@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Library - Music Converter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-icon {
+            font-size: 1.2em;
+        }
+        
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        
+        .item-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .item-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+        
+        .item-card.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .item-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 1.1em;
+        }
+        
+        .item-subtitle {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        
+        .item-count {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        
+        .item-card.selected .item-count {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .checkbox {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 18px;
+            height: 18px;
+            opacity: 0;
+        }
+        
+        .item-card.selected .checkbox {
+            opacity: 1;
+        }
+        
+        .actions {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 20px;
+            border-top: 1px solid #e9ecef;
+            text-align: center;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .selection-info {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: #666;
+            padding: 40px;
+        }
+        
+        .empty-state .icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎵 Your {{ platform.title() }} Library</h1>
+        <p>Select items to convert to {{ "YouTube Music" if target_platform == "ytm" else "Spotify" }}</p>
+    </div>
+    
+    <div class="container">
+        <form id="libraryForm" action="/match" method="post">
+            <input type="hidden" name="session_id" value="{{ session_id }}">
+            
+            <!-- Liked Songs Section -->
+            <div class="section">
+                <h2><span class="section-icon">❤️</span> Liked Songs</h2>
+                <div class="items-grid">
+                    {% for id, song in library.liked_songs.items() %}
+                    <div class="item-card" data-id="{{ id }}">
+                        <input type="checkbox" name="selected_items" value="{{ id }}" class="checkbox">
+                        <div class="item-title">{{ song.title }}</div>
+                        <div class="item-subtitle">{{ song.artist }}</div>
+                        <div class="item-count">Liked</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if not library.liked_songs %}
+                <div class="empty-state">
+                    <div class="icon">❤️</div>
+                    <p>No liked songs found</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Playlists Section -->
+            <div class="section">
+                <h2><span class="section-icon">📜</span> Playlists</h2>
+                <div class="items-grid">
+                    {% for id, playlist in library.playlists.items() %}
+                    <div class="item-card" data-id="{{ id }}">
+                        <input type="checkbox" name="selected_items" value="{{ id }}" class="checkbox">
+                        <div class="item-title">{{ playlist.name }}</div>
+                        <div class="item-subtitle">{{ playlist.tracks|length }} tracks</div>
+                        <div class="item-count">{{ playlist.tracks|length }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if not library.playlists %}
+                <div class="empty-state">
+                    <div class="icon">📜</div>
+                    <p>No playlists found</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Albums Section -->
+            <div class="section">
+                <h2><span class="section-icon">💿</span> Saved Albums</h2>
+                <div class="items-grid">
+                    {% for id, album in library.albums.items() %}
+                    <div class="item-card" data-id="{{ id }}">
+                        <input type="checkbox" name="selected_items" value="{{ id }}" class="checkbox">
+                        <div class="item-title">{{ album.name }}</div>
+                        <div class="item-subtitle">{{ album.artist }}</div>
+                        <div class="item-count">Album</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if not library.albums %}
+                <div class="empty-state">
+                    <div class="icon">💿</div>
+                    <p>No saved albums found</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Artists Section -->
+            <div class="section">
+                <h2><span class="section-icon">👤</span> Followed Artists</h2>
+                <div class="items-grid">
+                    {% for id, artist in library.artists.items() %}
+                    <div class="item-card" data-id="{{ id }}">
+                        <input type="checkbox" name="selected_items" value="{{ id }}" class="checkbox">
+                        <div class="item-title">{{ artist.name }}</div>
+                        <div class="item-subtitle">Artist</div>
+                        <div class="item-count">Followed</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if not library.artists %}
+                <div class="empty-state">
+                    <div class="icon">👤</div>
+                    <p>No followed artists found</p>
+                </div>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+    
+    <div class="actions">
+        <div class="selection-info">
+            <span id="selectedCount">0</span> items selected
+        </div>
+        <button type="button" class="btn btn-secondary" onclick="selectAll()">Select All</button>
+        <button type="button" class="btn btn-secondary" onclick="deselectAll()">Deselect All</button>
+        <button type="submit" form="libraryForm" class="btn" id="continueBtn" disabled>
+            Continue with <span id="selectedCountBtn">0</span> items
+        </button>
+    </div>
+
+    <script>
+        const itemCards = document.querySelectorAll('.item-card');
+        const checkboxes = document.querySelectorAll('.checkbox');
+        const selectedCountSpan = document.getElementById('selectedCount');
+        const selectedCountBtn = document.getElementById('selectedCountBtn');
+        const continueBtn = document.getElementById('continueBtn');
+        
+        function updateSelectionCount() {
+            const selectedCount = document.querySelectorAll('.checkbox:checked').length;
+            selectedCountSpan.textContent = selectedCount;
+            selectedCountBtn.textContent = selectedCount;
+            continueBtn.disabled = selectedCount === 0;
+        }
+        
+        itemCards.forEach(card => {
+            card.addEventListener('click', (e) => {
+                if (e.target.type === 'checkbox') return;
+                
+                const checkbox = card.querySelector('.checkbox');
+                checkbox.checked = !checkbox.checked;
+                card.classList.toggle('selected', checkbox.checked);
+                updateSelectionCount();
+            });
+        });
+        
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                const card = checkbox.closest('.item-card');
+                card.classList.toggle('selected', checkbox.checked);
+                updateSelectionCount();
+            });
+        });
+        
+        function selectAll() {
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = true;
+                checkbox.closest('.item-card').classList.add('selected');
+            });
+            updateSelectionCount();
+        }
+        
+        function deselectAll() {
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+                checkbox.closest('.item-card').classList.remove('selected');
+            });
+            updateSelectionCount();
+        }
+        
+        // Initialize count
+        updateSelectionCount();
+    </script>
+</body>
+</html> 
