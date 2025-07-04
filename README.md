@@ -127,7 +127,6 @@ spotify-ytm-converter/
 ├── requirements.txt      # Python dependencies
 
 ├── README.md            # This file
-
 └── templates/           # HTML templates
     ├── index.html       # Landing page
     ├── library.html     # Library selection
