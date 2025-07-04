@@ -22,5 +22,5 @@ Convert your playlists, liked songs, and albums between Spotify and YouTube Musi
 
 1. **Clone the repository:**
    ```sh
-  git clone https://github.com/Xhanti-mbasa/playlist-transformer.git
+   git clone https://github.com/Xhanti-mbasa/playlist-transformer.git
    cd playlist-transformer
