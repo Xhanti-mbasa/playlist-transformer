@@ -1,6 +1,6 @@
-Spotify ↔ YouTube Music Playlist Converter
+## Spotify ↔ YouTube Music Playlist Converter
 
-A bi-directional music playlist converter that allows you to transfer your music library between Spotify and YouTube Music using browser-based authentication (no API keys required).
+** A bi-directional music playlist converter that allows you to transfer your music library between Spotify and YouTube Music using browser-based authentication (no API keys required). ***
 ✨ Features
 
     Bi-directional conversion: Spotify → YouTube Music and YouTube Music → Spotify
@@ -10,22 +10,24 @@ A bi-directional music playlist converter that allows you to transfer your music
     Local processing: All data stays on your device - nothing is sent externally
     Modern web interface: Clean, responsive UI built with FastAPI
 
-🚀 Quick Start
+## 🚀 Quick Start
 Prerequisites
 
-    Python 3.8 or higher
-    Chrome browser installed
-    ChromeDriver (will be auto-downloaded by Selenium)
+    - Python 3.8 or higher
+    - Chrome browser installed
+    - ChromeDriver (will be auto-downloaded by Selenium)
 
-Installation
+## Installation
 
-    Clone or download the project
+ **Clone or download the project**
+    
+  ```sh
+    git clone https://github.com/Xhanti-mbasa/playlist-transformer.git
+    cd playlist-transformer
+    
+## Install dependencies
 
-    git clone <repository-url>
-    cd spotify-ytm-converter
-
-    Install dependencies
-
+  ```sh
     pip install -r requirements.txt
 
     Run the application
@@ -49,39 +51,39 @@ Authentication Issues
     Some platforms may require 2FA - complete the verification in the browser window
     The browser window will stay open until authentication is complete or you cancel
 
-📖 Usage Guide
-Step 1: Choose Direction
+## 📖 Usage Guide
+## Step 1: Choose Direction
 
     Select whether you want to convert from Spotify to YouTube Music or vice versa
     Click "Start Conversion"
 
-Step 2: Authenticate
+## Step 2: Authenticate
 
     The app will open browser windows for authentication
     Log in to your accounts when prompted
     The app will automatically capture your session
 
-Step 3: Select Content
+## Step 3: Select Content
 
     Browse your library (playlists, liked songs, albums, artists)
     Select the items you want to convert
     Click "Continue"
 
-Step 4: Review Matches
+## Step 4: Review Matches
 
     Review the automatic matches found on the target platform
     Correct any mismatches using the manual correction feature
     Deselect any unwanted tracks
 
-Step 5: Create Playlist
+## Step 5: Create Playlist
 
     Confirm your selection
     The app will create a new playlist on the target platform
     You'll receive a link to your new playlist
 
-🏗️ Architecture
+## 🏗️ Architecture
 
-The application is built with a modular architecture:
+## The application is built with a modular architecture:
 
     api.py: FastAPI server with all endpoints and session management
     auth_browser.py: Browser automation for authentication
